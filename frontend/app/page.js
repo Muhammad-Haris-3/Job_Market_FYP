@@ -4,114 +4,66 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8080/api/stats")
       .then((res) => res.json())
       .then((incomingData) => {
-        // Agar backend se error aya (dictionary format)
-        if (incomingData.error) {
-          setError(incomingData.error);
-        } else {
-          // Agar sahi list aayi
-          setData(incomingData);
-        }
+        setData(incomingData);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error:", err);
-        setError("Backend se connect nahi ho pa raha.");
+        console.error("Connection Error:", err);
         setLoading(false);
       });
   }, []);
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        fontFamily: "Arial",
-        backgroundColor: "#f4f4f4",
-        minHeight: "100vh",
-      }}
-    >
-      <h1 style={{ textAlign: "center", color: "#333" }}>
-        🏨 Hotel Bookings Data (Top 50 Rows)
-      </h1>
+    <div className="min-h-screen bg-gray-100 p-8">
+      {/* 1. Header Card with Margin/Padding */}
+      <div className="bg-white rounded-xl shadow-md p-6 mb-8 border-l-8 border-blue-600">
+        <h2 className="text-3xl font-extrabold text-gray-800">
+          📊 Booking Analytics
+        </h2>
+        <p className="text-gray-500 mt-2 text-lg">
+          Detailed view of hotel reservation data.
+        </p>
+      </div>
 
       {loading ? (
-        <p style={{ textAlign: "center", fontSize: "18px" }}>
-          ⏳ Loading Data...
-        </p>
-      ) : error ? (
-        <div
-          style={{
-            color: "red",
-            textAlign: "center",
-            border: "1px solid red",
-            padding: "10px",
-            background: "#ffe6e6",
-          }}
-        >
-          <h3>⚠️ Error:</h3>
-          <p>{error}</p>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
         </div>
       ) : (
-        // --- TABLE DISPLAY ---
-        <div
-          style={{
-            overflowX: "auto",
-            background: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              minWidth: "600px",
-            }}
-          >
-            {/* Table Header (Automatic Columns) */}
-            <thead>
-              <tr
-                style={{
-                  backgroundColor: "#0070f3",
-                  color: "white",
-                  textAlign: "left",
-                }}
-              >
+        // 2. Main Table Container with Shadow and Radius
+        <div className="overflow-x-auto shadow-2xl rounded-lg">
+          <table className="min-w-full bg-white border-collapse border border-gray-200">
+            {/* Table Head (Dark Blue) */}
+            <thead className="bg-blue-800 text-white">
+              <tr>
                 {data.length > 0 &&
                   Object.keys(data[0]).map((key) => (
                     <th
                       key={key}
-                      style={{
-                        padding: "12px",
-                        borderBottom: "2px solid #ddd",
-                      }}
+                      className="py-4 px-6 text-left text-sm font-bold uppercase tracking-wider border-r border-blue-700 last:border-r-0"
                     >
-                      {key.replace(/_/g, " ").toUpperCase()}
+                      {key.replace(/_/g, " ")}
                     </th>
                   ))}
               </tr>
             </thead>
 
-            {/* Table Body (Rows) */}
-            <tbody>
-              {data.map((row, rowIndex) => (
+            {/* Table Body with Borders & Zebra Stripes */}
+            <tbody className="text-gray-700 text-sm">
+              {data.map((row, index) => (
                 <tr
-                  key={rowIndex}
-                  style={{
-                    borderBottom: "1px solid #ddd",
-                    backgroundColor: rowIndex % 2 === 0 ? "#f9f9f9" : "white",
-                  }}
+                  key={index}
+                  className="border-b border-gray-200 hover:bg-blue-100 transition duration-150 even:bg-gray-50"
                 >
-                  {Object.values(row).map((val, colIndex) => (
+                  {Object.values(row).map((val, i) => (
                     <td
-                      key={colIndex}
-                      style={{ padding: "10px", color: "#333" }}
+                      key={i}
+                      className="py-3 px-6 border-r border-gray-200 last:border-r-0 whitespace-nowrap"
                     >
                       {val}
                     </td>
@@ -125,4 +77,3 @@ export default function Home() {
     </div>
   );
 }
-// done
